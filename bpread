@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+# Tim Osburn
+# 201129
+
+import re
+import datetime
+import os
+
+bpfile = (os.path.expanduser('~/.bp.txt'))
+
+file = open(bpfile, 'r')
+# wholefile = file.read()
+
+linenumber=0
+
+# Prin Header
+print ('Date/Time,Type,Measurement')
+
+for line in file:
+    linenumber += 1
+    if re.match("^2(.*)", line):
+        # print (line, end = '')
+        YYMMDD = (line.split(None, 1)[0])
+        YYMMDD_YEAR = [YYMMDD[i:i+2] for i in range(0, len(YYMMDD), 2)][0]
+        YYMMDD_MONTH = [YYMMDD[i:i+2] for i in range(0, len(YYMMDD), 2)][1]
+        YYMMDD_DAY = [YYMMDD[i:i+2] for i in range(0, len(YYMMDD), 2)][2]
+        NEWYYMMDD = YYMMDD_YEAR + "-" + YYMMDD_MONTH + "-" + YYMMDD_DAY
+        MILTIME = (line.split(None, 2)[1])
+        NEWSTAMP = NEWYYMMDD + " " + MILTIME
+        LINEDAT =  (line.split(None, 2)[-1]).rstrip()
+        date_time_obj = datetime.datetime.strptime(NEWSTAMP, '%y-%m-%d %H:%M')
+        skip=0
+        if "min" in LINEDAT:
+            TYPE = 'WALKING'
+        elif "lbs" in LINEDAT:
+            TYPE = 'WEIGHT'
+        elif "SLEEP" in LINEDAT:
+            skip=1
+            TYPE = 'SLEEP'
+
+        elif "NOTE" in LINEDAT:
+            TYPE = 'NOTE'
+        elif "L" in LINEDAT:
+            TYPE = 'BPL'
+            LINEDAT = LINEDAT[2:]
+        elif "R" in LINEDAT:
+            TYPE = 'BPR'
+            LINEDAT = LINEDAT[2:]
+        else:
+            print()
+            print("Unknown read type in: " + str(bpfile))
+            print("Line: " + str(linenumber))
+            print("String is: " + str(line))
+            exit()
+        # print (str(date_time_obj) + ',' + TYPE + ',' +LINEDAT)
+        if not skip:
+            print ('"' + str(date_time_obj.strftime("%a, %b %d, %Y %I:%M %p")) + '",' + TYPE + ',' +LINEDAT.replace("/",","))
+        else:
+            print("------------- " + LINEDAT + " -------------")
+
+
+
+file.close()
