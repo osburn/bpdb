@@ -6,7 +6,57 @@ import sqlite3
 import re
 import datetime
 import os
+from pprint import pprint
 
-bpdatabase = (os.path.expanduser('~/.bp.db'))
-conn = sqlite3.connect(bpdatabase)
+def dbopen():
+    bpdatabase = (os.path.expanduser('~/.bp.db'))
+    return sqlite3.connect(bpdatabase)
 
+def dbsetup(dbcur):
+    # Should probably move this into a class
+
+    # TABLE: bp = blood pressure reading
+    # Date/Time
+    # Location = Left arm, Right arm
+    # SYS = SYSTOLIC, Upper Number
+    # DIA = DIASTOLIC, Lower Number
+    # PULSE = Pulse
+    dbres = dbcur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='bp';")
+    dbres = dbres.fetchone()
+    print(dbres)
+
+    # TABLE: tm = Treadmill
+    # START Date/Time
+    # Minutes
+    # Incline
+    # Distance
+    # Calories burned
+    dbres = dbcur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='tm';")
+    dbres = dbres.fetchone()
+    print(dbres)
+
+    # TABLE: weight
+    # Date/Time
+    # Weight reading
+    dbres = dbcur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='weight';")
+    dbres = dbres.fetchone()
+    print(dbres)
+
+    # TABLE: notes = Notes
+    # Date/Time
+    # open field of characters
+    dbres = dbcur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='notes';")
+    dbres = dbres.fetchone()
+    print(dbres)
+
+    # TABLE: sleep = Sleep time
+    # Wakeup time/date
+    # Duration of sleep
+    dbres = dbcur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='sleep';")
+    dbres = dbres.fetchone()
+    print(dbres)
+    return
+
+dbconn = dbopen()
+dbcur = dbconn.cursor()
+dbsetup(dbcur)
